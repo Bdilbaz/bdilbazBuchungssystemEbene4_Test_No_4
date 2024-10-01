@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meetingraum Buchung</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #F5F5F5;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        header {
+            text-align: center;
+            background-color: #84BD22; /* grüner Hintergrund */
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            margin: 0;
+            color: #fff;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .date-header {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* 4 Spalten */
+            gap: 10px;
+        }
+        .time-block {
+            border: 1px solid #299E8E; /* blauer Rand */
+            border-radius: 5px;
+            padding: 20px;
+            transition: background-color 0.3s;
+            cursor: pointer;
+            background-color: #84BD22; /* Standard grün */
+            text-align: center;
+            height: 80px; /* Höhe der Blöcke erhöht */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em; /* Größere Schriftgröße */
+        }
+        .booked {
+            background-color: #fff; /* gebuchte Zeit in Weiß */
+            color: #299E8E; /* Schriftfarbe Blau */
+        }
+        .feedback-section {
+            margin-top: 40px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+        .feedback-section h2 {
+            margin-top: 0;
+        }
+        .feedback-input {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .submit-feedback {
+            padding: 10px 20px;
+            background-color: #84BD22; /* Grüner Button */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Meetingraum Buchungssystem</h1>
+    </header>
+    <div class="container">
+        <div class="date-header" id="currentDate"></div>
+        <h2>Buchbare Zeiten</h2>
+        <div class="grid" id="timeSlots">
+            <!-- Zeitblöcke werden hier dynamisch hinzugefügt -->
+        </div>
+
+        <div class="feedback-section">
+            <h2>Feedback einfügen</h2>
+            <form id="feedbackForm" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+                <textarea class="feedback-input" id="feedbackInput" name="feedback" placeholder="Ihr Feedback..." required></textarea>
+                <button type="submit" class="submit-feedback">Feedback absenden</button>
+                <div id="feedbackMessage" style="color: green;"></div>
+            </form>
+        </div>
+    </div>
+    <div class="footer">
+        <p>&copy; 2024 GREEN IT Das Systemhaus GmbH</p>
+    </div>
+
+    <script>
+        // Aktuelles Datum und Wochentag anzeigen
+        const currentDateElement = document.getElementById('currentDate');
+        const currentDate = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        currentDateElement.textContent = currentDate.toLocaleDateString('de-DE', options);
+
+        // Zeiten von 8 bis 17 Uhr erstellen
+        const timeSlots = [];
+        for (let hour = 8; hour <= 17; hour++) {
+            timeSlots.push(`${hour}:00`);
+            timeSlots.push(`${hour}:30`);
+        }
+
+        const bookedSlots = {
+            '9:00': 'Project Management',
+            '10:30': 'Billing',
+            '12:00': 'P&C',
+            '15:00': 'Project Management',
+            // Hier können weitere gebuchte Slots hinzugefügt werden
+        };
+
+        const timeSlotsContainer = document.getElementById('timeSlots');
+
+        timeSlots.forEach(slot => {
+            const slotDiv = document.createElement('div');
+            slotDiv.className = 'time-block';
+            slotDiv.textContent = slot;
+
+            if (bookedSlots[slot]) {
+                slotDiv.classList.add('booked');
+                slotDiv.textContent = `${bookedSlots[slot]}`; // Nur die Abteilung anzeigen
+            }
+
+            slotDiv.addEventListener('click', () => {
+                if (!bookedSlots[slot]) {
+                    const department = prompt('Bitte geben Sie Ihre Abteilung ein (z.B. Project Management, Billing, P&C):');
+                    if (department) {
+                        bookedSlots[slot] = department; // Buchung hinzufügen
+                        slotDiv.classList.add('booked');
+                        slotDiv.textContent = `${department}`; // Nur die Abteilung anzeigen
+                    }
+                }
+            });
+            timeSlotsContainer.appendChild(slotDiv);
+        });
+
+        // Feedback absenden
+        document.getElementById('feedbackForm').addEventListener('submit', (event) => {
+            const feedbackMessage = document.getElementById('feedbackMessage');
+            feedbackMessage.textContent = 'Ihr Feedback wurde erfolgreich eingereicht!';
+        });
+    </script>
+</body>
+</html>
